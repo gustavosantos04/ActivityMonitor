@@ -36,7 +36,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 @router.post("/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == form_data.username).first()
-    if not user or not user.verify_password(form_data.password):
+    if not user or not pwd_context.verify(form_data.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Credenciais inválidas")
     
     access_token = create_access_token(data={"sub": user.email})
@@ -45,3 +45,15 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 @router.get("/protected")
 def protected_route(current_user: User = Depends(get_current_user)):
     return {"message": f"Olá, {current_user.full_name}. Você está autenticado!"}
+
+@router.get("/users/", response_model=list[UserOut])
+def list_users(
+    db: Session = Depends(get_db), 
+    current_user: User = Depends(get_current_user)
+):
+    # Apenas superuser pode listar todos os usuários, por segurança
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=403, detail="Acesso negado")
+
+    users = db.query(User).all()
+    return users
