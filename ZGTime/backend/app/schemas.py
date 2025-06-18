@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime, date, time
+from pydantic import BaseModel, EmailStr
 
 class ActivityCreate(BaseModel):
     username: str
@@ -22,3 +23,21 @@ class ManualEntryResponse(ManualEntryCreate):
     model_config = {
         "from_attributes": True
     }
+
+class UserCreate(BaseModel):
+    full_name: str
+    cpf: str
+    email: EmailStr
+    password: str
+    team: str
+    is_superuser: bool  # ← novo campo
+
+class UserOut(BaseModel):
+    id: int
+    full_name: str
+    email: EmailStr
+    team: str
+    is_superuser: bool
+
+    class Config:
+        from_attributes = True  # substitui orm_mode
