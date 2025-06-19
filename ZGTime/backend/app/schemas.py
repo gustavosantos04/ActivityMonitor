@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime, date, time
 from pydantic import BaseModel, EmailStr
+from typing import Optional
 
 class ActivityCreate(BaseModel):
     username: str
@@ -41,3 +42,11 @@ class UserOut(BaseModel):
 
     class Config:
         from_attributes = True  # substitui orm_mode
+        
+        
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    password: Optional[str] = None
+    team: Optional[str] = None
+    is_superuser: Optional[bool] = None

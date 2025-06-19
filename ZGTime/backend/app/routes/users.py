@@ -7,6 +7,7 @@ from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordRequestForm
 from app.auth.auth import create_access_token
 from app.auth.security import get_current_user  # <-- importante
+from app.schemas import UserUpdate  # vamos criar isso também
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -57,3 +58,51 @@ def list_users(
 
     users = db.query(User).all()
     return users
+
+@router.put("/users/{user_id}", response_model=UserOut)
+def update_user(
+    user_id: int,
+    updated_user: UserUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+    # Apenas superuser pode editar usuários
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=403, detail="Apenas superusuários podem editar usuários")
+
+    if updated_user.full_name:
+        user.full_name = updated_user.full_name
+    if updated_user.email:
+        existing = db.query(User).filter(User.email == updated_user.email, User.id != user_id).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="Email já em uso")
+        user.email = updated_user.email
+    if updated_user.password:
+        user.hashed_password = pwd_context.hash(updated_user.password)
+    if updated_user.team:
+        user.team = updated_user.team
+
+    db.commit()
+    db.refresh(user)
+    return user
+
+@router.delete("/users/{user_id}")
+def delete_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=403, detail="Apenas superusuários podem deletar usuários")
+
+    db.delete(user)
+    db.commit()
+    return {"message": "Usuário deletado com sucesso"}

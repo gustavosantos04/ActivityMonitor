@@ -1,13 +1,17 @@
-import { useState } from "react";
+// src/App.jsx
+import { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import styled, { ThemeProvider } from "styled-components";
 import { theme } from "./theme";
 import { GlobalStyles } from "./GlobalStyles";
+import axios from "axios";
 
 import Dashboard from "./pages/Dashboard";
 import ActivitiesLog from "./pages/ActivitiesLog";
 import Analytics from "./pages/Analytics";
 import ManualEntry from "./pages/ManualEntry";
 import ManualEntriesList from "./pages/ManualEntriesList";
+import Login from "./pages/Login/Login";
 
 const AppContainer = styled.div`
   min-height: 100vh;
@@ -44,6 +48,11 @@ const NavButton = styled.button`
   }
 `;
 
+function ProtectedRoute({ children }) {
+  const token = localStorage.getItem("token");
+  return token ? children : <Navigate to="/login" />;
+}
+
 function App() {
   const [page, setPage] = useState("dashboard");
   const [selectedUser, setSelectedUser] = useState(null);
@@ -56,41 +65,66 @@ function App() {
     { id: "manual-list", label: "Listar Horas Manuais" },
   ];
 
-  // Função para navegar para aba de histórico com filtro de usuário
+  // após const tabs = [...]
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/login"; // recarrega completamente e redireciona
+  };
+
   const handleViewUserLog = (username) => {
     setSelectedUser(username);
     setPage("log");
   };
 
-  // Função para navegar entre abas, limpa filtro se for aba "log"
   const handleTabClick = (id) => {
     setPage(id);
     if (id === "log") setSelectedUser(null);
   };
 
+  const Layout = () => (
+    <>
+      <NavBar>
+        {tabs.map(({ id, label }) => (
+          <NavButton
+            key={id}
+            active={page === id}
+            onClick={() => handleTabClick(id)}
+            aria-current={page === id ? "page" : undefined}
+          >
+            {label}
+          </NavButton>
+        ))}
+        <NavButton onClick={handleLogout} style={{ marginLeft: "auto" }}>
+          Sair
+        </NavButton>
+      </NavBar>
+
+      {page === "dashboard" && <Dashboard onViewUserLog={handleViewUserLog} />}
+      {page === "log" && <ActivitiesLog filterUser={selectedUser} />}
+      {page === "analytics" && <Analytics />}
+      {page === "manual" && <ManualEntry />}
+      {page === "manual-list" && <ManualEntriesList />}
+    </>
+  );
+
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyles />
-      <AppContainer>
-        <NavBar>
-          {tabs.map(({ id, label }) => (
-            <NavButton
-              key={id}
-              active={page === id}
-              onClick={() => handleTabClick(id)}
-              aria-current={page === id ? "page" : undefined}
-            >
-              {label}
-            </NavButton>
-          ))}
-        </NavBar>
-
-        {page === "dashboard" && <Dashboard onViewUserLog={handleViewUserLog} />}
-        {page === "log" && <ActivitiesLog filterUser={selectedUser} />}
-        {page === "analytics" && <Analytics />}
-        {page === "manual" && <ManualEntry />}
-        {page === "manual-list" && <ManualEntriesList />}
-      </AppContainer>
+      <Router>
+        <AppContainer>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <Layout />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </AppContainer>
+      </Router>
     </ThemeProvider>
   );
 }
