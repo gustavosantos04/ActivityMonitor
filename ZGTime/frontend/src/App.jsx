@@ -18,6 +18,8 @@ import Analytics from "./pages/Analytics";
 import ManualEntry from "./pages/ManualEntry";
 import ManualEntriesList from "./pages/ManualEntriesList";
 import Login from "./pages/Login/Login";
+import ForgotPassword from "./pages/Login/ForgotPassword";
+// import ResetPassword from "./pages/Login/ResetPassword"; // descomente se já existir
 
 const AppLayout = styled.div`
   display: flex;
@@ -87,6 +89,8 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          {/* <Route path="/reset-password" element={<ResetPassword />} /> */}
           <Route
             path="/"
             element={

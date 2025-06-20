@@ -38,7 +38,7 @@ const RightPanel = styled.div`
   justify-content: center;
   padding: 3rem;
   position: relative;
-  color: #ffff;
+  color: #fff;
 `;
 
 const Logo = styled.img`
@@ -50,13 +50,13 @@ const SystemName = styled.h1`
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-weight: 700;
   font-size: 2.4rem;
-  color: #ffff;
+  color: #fff;
   margin-bottom: 0.5rem;
 `;
 
 const Tagline = styled.p`
   font-size: 1rem;
-  color: ${({ theme }) => theme.colors.accent};
+  color: ${({ theme }) => theme.colors.accent || "#ccc"};
   font-weight: 500;
   font-style: italic;
 `;
@@ -87,7 +87,7 @@ const Button = styled.button`
   font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
-  box-shadow: #1c1c1c;
+  box-shadow: 0px 5px 10px #333;
   transition: background-color 0.3s ease;
 
   &:hover {
@@ -107,7 +107,7 @@ const ForgotPassword = styled.p`
   font-size: 0.9rem;
   color: ${({ theme }) => theme.colors.text};
 
-  a {
+  span {
     color: #1c1c1c;
     text-decoration: none;
     font-weight: 600;
@@ -144,6 +144,10 @@ const Login = () => {
     }
   };
 
+  const handleForgotPassword = () => {
+    navigate("/forgot-password");
+  };
+
   return (
     <Container>
       <Wrapper>
@@ -168,14 +172,13 @@ const Login = () => {
             <Button type="submit">Entrar</Button>
           </form>
           <ForgotPassword>
-            <a href="#">Esqueci minha senha</a>
+            <span onClick={handleForgotPassword}>Esqueci minha senha</span>
           </ForgotPassword>
         </LeftPanel>
 
         <RightPanel>
-          {/* Este é um comentário de linha em JSX 
-          <SystemName>ZGTime</SystemName>
-          <Tagline>Monitoramento de Atividades</Tagline>*/}
+          {/* <SystemName>ZGTime</SystemName>
+          <Tagline>Monitoramento de Atividades</Tagline> */}
           <Logo src="/ZGlogo.png" alt="Zavagna Gralha Advogados" />
         </RightPanel>
       </Wrapper>

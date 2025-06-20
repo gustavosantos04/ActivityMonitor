@@ -8,9 +8,18 @@ from fastapi.security import OAuth2PasswordRequestForm
 from app.auth.auth import create_access_token
 from app.auth.security import get_current_user  # <-- importante
 from app.schemas import UserUpdate  # vamos criar isso também
+from pydantic import BaseModel, EmailStr
+import datetime
+from datetime import timedelta
+from app.auth.auth import verify_access_token
+from app.utils.email import send_reset_email  # importe a função
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
 
 @router.post("/users/", response_model=UserOut)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
@@ -106,3 +115,37 @@ def delete_user(
     db.delete(user)
     db.commit()
     return {"message": "Usuário deletado com sucesso"}
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+@router.post("/forgot-password/")
+async def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == request.email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+    reset_token = create_access_token(
+    data={"sub": user.email},
+    expires_delta=timedelta(minutes=30)
+)
+    
+    await send_reset_email(user.email, reset_token)
+
+    return {"message": "Instruções enviadas para seu e-mail."}
+
+@router.post("/reset-password/")
+def reset_password(data: ResetPasswordRequest, db: Session = Depends(get_db)):
+    payload = verify_access_token(data.token)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Token inválido ou expirado")
+
+    email = payload.get("sub")
+    user = db.query(User).filter(User.email == email).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+    user.hashed_password = pwd_context.hash(data.new_password)
+    db.commit()
+    return {"message": "Senha atualizada com sucesso"}
