@@ -19,7 +19,7 @@ import ManualEntry from "./pages/ManualEntry";
 import ManualEntriesList from "./pages/ManualEntriesList";
 import Login from "./pages/Login/Login";
 import ForgotPassword from "./pages/Login/ForgotPassword";
-// import ResetPassword from "./pages/Login/ResetPassword"; // descomente se já existir
+import ResetPassword from "./pages/Login/ResetPassword"; // descomentei e importei
 
 const AppLayout = styled.div`
   display: flex;
@@ -88,9 +88,12 @@ function App() {
       <GlobalStyles />
       <Router>
         <Routes>
+          {/* Rotas públicas */}
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          {/* <Route path="/reset-password" element={<ResetPassword />} /> */}
+          <Route path="/reset-password" element={<ResetPassword />} />
+
+          {/* Rotas protegidas */}
           <Route
             path="/"
             element={
@@ -135,13 +138,18 @@ function App() {
                       <FaClipboardList />
                       Listar Horas
                     </SidebarButton>
-                    <SidebarButton onClick={handleLogout} style={{ marginTop: "auto" }}>
+                    <SidebarButton
+                      onClick={handleLogout}
+                      style={{ marginTop: "auto" }}
+                    >
                       <FaSignOutAlt />
                       Sair
                     </SidebarButton>
                   </Sidebar>
                   <ContentArea>
-                    {page === "dashboard" && <Dashboard onViewUserLog={handleViewUserLog} />}
+                    {page === "dashboard" && (
+                      <Dashboard onViewUserLog={handleViewUserLog} />
+                    )}
                     {page === "log" && <ActivitiesLog filterUser={selectedUser} />}
                     {page === "analytics" && <Analytics />}
                     {page === "manual" && <ManualEntry />}

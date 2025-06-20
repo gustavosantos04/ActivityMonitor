@@ -3,8 +3,9 @@ from fastapi_mail import FastMail, MessageSchema, MessageType
 from app.email_config import get_email_config
 
 
-async def send_reset_email(email_to: str, token: str):
-    reset_link = f"http://localhost:5173/reset-password?token={token}"
+async def send_reset_email(email_to: str, reset_token: str):
+    frontend_url = "http://localhost:5173/reset-password"  # ou o domínio do seu front em produção
+    reset_link = f"{frontend_url}?token={reset_token}"
 
     html_body = f"""
 <!DOCTYPE html>
