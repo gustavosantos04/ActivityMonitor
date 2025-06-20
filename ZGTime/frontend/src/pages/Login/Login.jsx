@@ -153,7 +153,7 @@ const Login = () => {
           <form onSubmit={handleLogin}>
             <Input
               type="email"
-              placeholder="Email"
+              placeholder="E-mail"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
