@@ -11,19 +11,61 @@ const Container = styled.div`
   background-color: ${({ theme }) => theme.colors.background};
 `;
 
-const FormWrapper = styled.div`
-  background-color: #fff;
+const Wrapper = styled.div`
+  display: flex;
+  width: 900px;
+  height: 500px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+  background: #fff;
+`;
+
+const LeftPanel = styled.div`
+  flex: 1;
   padding: 3rem;
-  border-radius: ${({ theme }) => theme.borderRadius};
-  box-shadow: ${({ theme }) => theme.shadows.card};
-  width: 100%;
-  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`;
+
+const RightPanel = styled.div`
+  flex: 1;
+  background-color: #1c1c1c;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  position: relative;
+  color: #ffff;
+`;
+
+const Logo = styled.img`
+  width: 240px;
+  height: auto;
+`;
+
+const SystemName = styled.h1`
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 700;
+  font-size: 2.4rem;
+  color: #ffff;
+  margin-bottom: 0.5rem;
+`;
+
+const Tagline = styled.p`
+  font-size: 1rem;
+  color: ${({ theme }) => theme.colors.accent};
+  font-weight: 500;
+  font-style: italic;
 `;
 
 const Title = styled.h2`
-  text-align: center;
   margin-bottom: 2rem;
   color: ${({ theme }) => theme.colors.text};
+  display: flex;
+  justify-content: center;
 `;
 
 const Input = styled.input`
@@ -38,18 +80,18 @@ const Input = styled.input`
 const Button = styled.button`
   width: 100%;
   padding: 0.75rem;
-  background-color: ${({ theme }) => theme.colors.primary};
+  background-color: #1c1c1c;
   color: white;
   border: none;
   border-radius: ${({ theme }) => theme.borderRadius};
   font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
-  box-shadow: ${({ theme }) => theme.shadows.buttonShadow};
+  box-shadow: #1c1c1c;
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: ${({ theme }) => theme.colors.primaryHover};
+    background-color: #333;
   }
 `;
 
@@ -63,13 +105,18 @@ const ForgotPassword = styled.p`
   text-align: right;
   margin-top: 1rem;
   font-size: 0.9rem;
+  color: ${({ theme }) => theme.colors.text};
 
   a {
-    color: ${({ theme }) => theme.colors.primary};
+    color: #1c1c1c;
     text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.3s ease, text-decoration 0.3s ease;
 
     &:hover {
-      text-decoration: underline;
+      color: #333b;
+      text-decoration: none;
     }
   }
 `;
@@ -99,30 +146,39 @@ const Login = () => {
 
   return (
     <Container>
-      <FormWrapper>
-        <Title>Entrar no Sistema</Title>
-        {error && <ErrorText>{error}</ErrorText>}
-        <form onSubmit={handleLogin}>
-          <Input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <Input
-            type="password"
-            placeholder="Senha"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <Button type="submit">Entrar</Button>
-        </form>
-        <ForgotPassword>
-          <a href="#">Esqueci minha senha</a>
-        </ForgotPassword>
-      </FormWrapper>
+      <Wrapper>
+        <LeftPanel>
+          <Title>Entrar no Sistema</Title>
+          {error && <ErrorText>{error}</ErrorText>}
+          <form onSubmit={handleLogin}>
+            <Input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <Input
+              type="password"
+              placeholder="Senha"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <Button type="submit">Entrar</Button>
+          </form>
+          <ForgotPassword>
+            <a href="#">Esqueci minha senha</a>
+          </ForgotPassword>
+        </LeftPanel>
+
+        <RightPanel>
+          {/* Este é um comentário de linha em JSX 
+          <SystemName>ZGTime</SystemName>
+          <Tagline>Monitoramento de Atividades</Tagline>*/}
+          <Logo src="/ZGlogo.png" alt="Zavagna Gralha Advogados" />
+        </RightPanel>
+      </Wrapper>
     </Container>
   );
 };
